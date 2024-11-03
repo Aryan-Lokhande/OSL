@@ -201,6 +201,105 @@ int CLOOK(){
     printf("Total head movement is %d", TotalHeadMoment);
     return 0;
 }
+Output :-
 
- 
+[Saru1594@localhost 8]$ ./a.out
 
+
+	*********** MENU ***********
+
+	1:SSTF
+
+	2:SCAN
+
+	3:CLOOK
+
+	4:EXIT
+
+	Enter your choice: 1
+Enter the number of Requests
+7
+Enter the Requests sequence
+82
+170
+43
+140
+24
+16
+190
+Enter initial head position
+50
+Total head movement is 208
+
+	Do u want to continue IF YES PRESS 1
+
+	IF NO PRESS 0: 1
+
+
+	*********** MENU ***********
+
+	1:SSTF
+
+	2:SCAN
+
+	3:CLOOK
+
+	4:EXIT
+
+	Enter your choice: 2
+Enter the number of Requests
+7
+Enter the Requests sequence
+82
+170
+43
+140
+
+24
+16
+190
+Enter initial head position
+50
+Enter total disk size
+200
+Enter the head movement direction for high 1 and for low 0
+1
+Total head movement is 332
+
+	Do u want to continue IF YES PRESS 1
+
+	IF NO PRESS 0: 1
+
+
+	*********** MENU ***********
+
+	1:SSTF
+
+	2:SCAN
+
+	3:CLOOK
+
+	4:EXIT
+
+	Enter your choice: 3
+Enter the number of Requests
+7
+Enter the Requests sequence
+82
+170
+43
+140
+24
+16
+190
+Enter initial head position
+50
+Enter total disk size
+200
+Enter the head movement direction for high 1 and for low 0
+1
+Total head movement is 341
+
+	Do u want to continue IF YES PRESS 1
+
+	IF NO PRESS 0: 0
