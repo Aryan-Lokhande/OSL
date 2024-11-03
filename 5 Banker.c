@@ -39,19 +39,19 @@ void input (int available[m]){
 	for(i=0;i<n;i++){
 		
 		printf("\nEnter the details of process P%d: ",i);
-		printf("\n\tEnter the allocates resources: ");
+		printf("\n\tEnter the allocated resources: ");
 		for(j=0;j<m;j++)
 		{
 			scanf("%d",&p[i].allocate[j]);
 		}
-		printf("\tEnter the max resourcess: ");
+		printf("\tEnter the max resources: ");
 		for(j=0;j<m;j++)
 		{
 			scanf("%d",&p[i].max[j]);
 			p[i].need[j]=p[i].max[j]-p[i].allocate[j];
 		}
 	}
-	printf("\nEnter the allvailable resources: ");
+	printf("\nEnter the available resources: ");
 	for(j=0;j<m;j++)
 	{
 		scanf("%d",&available[j]);
@@ -83,8 +83,7 @@ int isSafestate(int available[m],int safesequence[n])
 	return 0;
 }
 
-int safetyalgorithm(int available[m],int safesequence[n])
-{
+int safetyalgorithm(int available[m],int safesequence[n]){
     int i,j;
     
     int work[m],finish[n];
@@ -95,11 +94,9 @@ int safetyalgorithm(int available[m],int safesequence[n])
 	    finish[i]=0;
 		
 	int proceed=1,k=0;
-	while(proceed)
-	{
+	while(proceed){
 		proceed=0;
-		for(i=0;i<n;i++)
-		{
+		for(i=0;i<n;i++){
 			int flag=1;
 			if(finish[i]==0)
 			{
@@ -137,4 +134,43 @@ int safetyalgorithm(int available[m],int safesequence[n])
     return 0;
 }
 
+Output :-
 
+[Saru1594@localhost 5]$ gcc Banker.c 
+[Saru1594@localhost 5]$ ./a.out
+
+Enter No of processes: 5
+Enter no of resources: 3
+
+*****Enter details of process*****
+Enter the details of process P0: 
+	Enter the allocated resources: 0 1 0
+	Enter the max resources: 7 5 3
+
+Enter the details of process P1: 
+	Enter the allocated resources: 2 0 0
+	Enter the max resources: 3 2 2
+
+Enter the details of process P2: 
+	Enter the allocated resources: 3 0 2
+	Enter the max resources: 9 0 2
+
+Enter the details of process P3: 
+	Enter the allocated resources: 2 1 1
+	Enter the max resources: 2 2 2
+
+Enter the details of process P4: 
+	Enter the allocated resources: 0 0 2
+	Enter the max resources: 4 3 3
+
+Enter the available resources: 3 3 2
+
+	PID	ALLOCATE	MAX		NEED
+	P0	0 1 0 		7 5 3 		7 4 3 
+	P1	2 0 0 		3 2 2 		1 2 2 
+	P2	3 0 2 		9 0 2 		6 0 0 
+	P3	2 1 1 		2 2 2 		0 1 1 
+	P4	0 0 2 		4 3 3 		4 3 1 
+
+	SYSTEM IS IN SAFE STATE...
+safesequence is: P1 -> P3 -> P4 -> P0 -> P2 -> 
