@@ -11,17 +11,14 @@ int flag=0;
 int read_count=0;
 
 int getbuff() {
-
 	int temp;
 	printf("Enter the no to add in buffer : ");
 	scanf("%d",&temp);
-
 return temp;
 
 }
 
 void readbuff(int buffer) {
-
 	printf("Element read by reader=%d\n",buffer);
 }
 
@@ -34,7 +31,6 @@ int main() {
 	pthread_create(&wtid1,NULL,writer,NULL);
 	pthread_create(&rtid1,NULL,reader,NULL);
 	pthread_create(&rtid2,NULL,reader,NULL);
-
 	pthread_join(wtid1,NULL);
 	pthread_join(rtid1,NULL);
 	pthread_join(rtid2,NULL);
@@ -44,8 +40,7 @@ return 0;
 
 void*  writer(void *argp) {
 
-	while(1) {
-	
+	while(1) {	
 		pthread_mutex_lock(&wrt);
 		if(flag==0) {
 			buffer=getbuff();
@@ -56,16 +51,13 @@ void*  writer(void *argp) {
 }
 
 void* reader(void *argp) {
-
 	while(1){
 		pthread_mutex_lock(&mutex1);
 		read_count++;
-
 		if(read_count==1){
 			pthread_mutex_lock(&wrt);
 		}
 		pthread_mutex_unlock(&mutex1);
-
 		
 		if(flag==1){
 			readbuff(buffer);	
@@ -75,7 +67,6 @@ void* reader(void *argp) {
 		}
 		pthread_mutex_lock(&mutex1);
 		read_count--;
-
 		if(read_count==0) {
 			pthread_mutex_unlock(&wrt);
 		
@@ -85,3 +76,38 @@ void* reader(void *argp) {
 
 }
 
+
+Output :-
+
+sarthak1594@UbuntuInWin:~/OS Practical/4$ gcc reader-writer.c 
+sarthak1594@UbuntuInWin:~/OS Practical/4$ ./a.out
+Enter the no to add in writer buffer : 1
+Element read by reader=1
+Element read by reader=1
+Enter the no to add in writer buffer : 2
+Element read by reader=2
+Element read by reader=2
+Enter the no to add in writer buffer : 3
+Element read by reader=3
+Element read by reader=3
+Enter the no to add in writer buffer : 4
+Element read by reader=4
+Element read by reader=4
+Enter the no to add in writer buffer : 5
+Element read by reader=5
+Element read by reader=5
+Enter the no to add in writer buffer : 6
+Element read by reader=6
+Element read by reader=6
+Enter the no to add in writer buffer : 7
+Element read by reader=7
+Element read by reader=7
+Enter the no to add in writer buffer : 8
+Element read by reader=8
+Element read by reader=8
+Enter the no to add in writer buffer : 9
+Element read by reader=9
+Element read by reader=9
+Enter the no to add in writer buffer : 0
+Element read by reader=0
+Element read by reader=0
