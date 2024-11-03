@@ -73,7 +73,7 @@ void main() {
               int firstin=-1; 
               q.end=0; 
               printf("\nData Requested\tFrame contents\t    Page Fault\n=============================================="); 
-              for(cnt=0;cnt<count;cnt+=2)	{ 
+              for(cnt=0;cnt<count;cnt+=1)	{ 
                      printf("\n\n\t%c",string[cnt]); 
                      flag=0; 
                      for(cnt2=0;cnt2<q.end;cnt2++) { 
@@ -81,26 +81,22 @@ void main() {
                                    flag=1; 
                                    break; 
                             } 
-
                      } 
                      if(flag==0){ 
                             faults++; 
                             if(q.end<frameSize) {	
                                    enqueue(&q,string[cnt],q.end); 
                                    q.end++; 
-
                             } 
                             else{ 
                            
                                    dequeue(&q,firstin); 
                                    firstin=(firstin+1)%(q.end); 
-                                   enqueue(&q,string[cnt],firstin); 
-
+                                   enqueue(&q,string[cnt],firstin);
                             } 
                             printf("\t  "); 
                             for(cnt2=0;cnt2<q.end;cnt2++) { 
                                    printf("%c   ",q.data[cnt2][0]); 
-
                             } 
                             printf("\t\tY"); 
 
@@ -122,135 +118,321 @@ void main() {
        printf("\nTotal no. of Page Faults: %d\n\n",faults); 
 
 } 
-void optimal(char string[],int frameSize,int count){ 
-       int cnt,cnt2,selector,flag,max,faults=0; 
-       int distance[20]; 
-       queue q; 
-       q.end=0; 
-       printf("\nData Requested\tFrame contents\t    Page Fault\n=============================================="); 
-       for(cnt=0;cnt<count;cnt+=2){	
-              printf("\n\n\t%c",string[cnt]); 
-              flag=0; 
-              for(cnt2=0;cnt2<q.end;cnt2++) {	
+void optimal(char string[], int frameSize, int count) {
+    int cnt, cnt2, selector, flag, max, faults = 0;
+    int distance[20];
+    queue q;
+    q.end = 0;
+    printf("\nData Requested\tFrame contents\t    Page Fault\n==============================================");
+    
+    for (cnt = 0; cnt < count; cnt += 1) {
+        printf("\n\n\t%c", string[cnt]);
+        flag = 0;
 
-                     if(string[cnt]==q.data[cnt2][0]) { 
-                            flag=1; 
-                            break; 
+        // Check if the page is already in the frame
+        for (cnt2 = 0; cnt2 < q.end; cnt2++) {
+            if (string[cnt] == q.data[cnt2][0]) {
+                flag = 1;
+                break;
+            }
+        }
 
-                     } 
+        if (flag == 0) { // Page fault
+            faults++;
+            if (q.end < frameSize) { // If there is room in the frame
+                enqueue(&q, string[cnt], q.end);
+                q.end++;
+            } else { // If the frame is full, find the page to replace
+                // Calculate distances for each page in the frame
+                for (cnt2 = 0; cnt2 < q.end; cnt2++) {
+                    distance[cnt2] = 99; // Initialize with a large value
+                    for (int future = cnt + 1; future < count; future++) {
+                        if (string[future] == q.data[cnt2][0]) {
+                            distance[cnt2] = future; // When the page is next used
+                            break;
+                        }
+                    }
+                }
 
-              } 
+                // Find the page that is used the farthest in the future or not at all
+                max = 0;
+                selector = 0;
+                for (cnt2 = 0; cnt2 < q.end; cnt2++) {
+                    if (distance[cnt2] > max) {
+                        max = distance[cnt2];
+                        selector = cnt2;
+                    }
+                }
 
-              if(flag==0) { 
-                     faults++; 
-                     if(q.end<frameSize) {	
-                     enqueue(&q,string[cnt],q.end); 
-                     q.data[q.end][1]=cnt;	
-                     q.end++; 
-              } 
-              else { 
-                     for(cnt2=0;cnt2<q.end;cnt2++) {	
-                            distance[cnt2]=0; 
-                     }       
-                     for(selector=0;selector<q.end;selector++) {	
-                            for(cnt2=cnt;cnt2<count;cnt2+=2){         
-                                   if(string[cnt2]==q.data[selector][0]) { 
-                                          distance[selector]=cnt2/2; 
-                                          break; 
-                                   } 
-                                   if(distance[selector]==0) {   
-                                          distance[selector]=99-q.data[selector][1]; 
-                                   } 
-                            } 
-                     } 
-                     max=0; 
+                // Replace the page
+                dequeue(&q, selector);
+                enqueue(&q, string[cnt], selector);
+            }
 
-                     for(cnt2=0;cnt2<q.end;cnt2++) { 
-                            if(distance[cnt2]>max) { 
-                                   max=distance[cnt2]; 
-                                   selector=cnt2; 
-                           }       
-                     }       
-                     dequeue(&q,selector); 
-                     enqueue(&q,string[cnt],selector); 
-                     q.data[selector][1]=cnt;	
-                     } 
-                     printf("\t  "); 
-                     for(cnt2=0;cnt2<q.end;cnt2++) { 
-                            printf("%c   ",q.data[cnt2][0]); 
-                     } 
-                     printf("\t\tY"); 
-              } 
-              else {	
-                     printf("\t  "); 
-                     for(cnt2=0;cnt2<q.end;cnt2++) { 
-                            printf("%c   ",q.data[cnt2][0]); 
-                     }       
-                     printf("\t\tN"); 
-              } 
-       } 
-       printf("\n\n==============================================\n"); 
-       printf("\nTotal no. of Page Faults: %d\n\n",faults); 
+            // Print the frame contents
+            printf("\t  ");
+            for (cnt2 = 0; cnt2 < q.end; cnt2++) {
+                printf("%c   ", q.data[cnt2][0]);
+            }
+            printf("\t\tY");
+        } else { // No page fault
+            printf("\t  ");
+            for (cnt2 = 0; cnt2 < q.end; cnt2++) {
+                printf("%c   ", q.data[cnt2][0]);
+            }
+            printf("\t\tN");
+        }
+    }
 
-} 
-
+    printf("\n\n==============================================\n");
+    printf("\nTotal no. of Page Faults: %d\n\n", faults);
+}
  
 
-void lru(char string[],int frameSize,int count) { 
-       int cnt,cnt2,selector,flag,min,faults=0; 
-       queue q; 
-       q.end=0; 
-       printf("\nData Requested\tFrame contents\t    Page Fault\n=============================================="); 
-       for(cnt=0;cnt<count;cnt+=2)	{      
-              printf("\n\n\t%c",string[cnt]); 
-              flag=0; 
-              for(cnt2=0;cnt2<q.end;cnt2++) {	 
-                     if(string[cnt]==q.data[cnt2][0]) { 
-                            q.data[cnt2][1]=(cnt/2)+1;	
-                            flag=1; 
-                            break; 
+void lru(char string[], int frameSize, int count) { 
+    int cnt, cnt2, selector, flag, faults = 0; 
+    queue q; 
+    q.end = 0; 
+    int lastUsed[20] = {0}; // Array to keep track of last used times
+    printf("\nData Requested\tFrame contents\t    Page Fault\n=============================================="); 
+    
+    for(cnt = 0; cnt < count; cnt += 1) {      
+        printf("\n\n\t%c", string[cnt]); 
+        flag = 0; 
+        
+        // Check if the page is already in the frame
+        for(cnt2 = 0; cnt2 < q.end; cnt2++) {	 
+            if(string[cnt] == q.data[cnt2][0]) { 
+                flag = 1; 
+                break; 
+            } 
+        } 
+        
+        if(flag == 0) { // Page fault
+            faults++; 
+            if(q.end < frameSize) {	
+                enqueue(&q, string[cnt], q.end); 
+                q.end++; 
+            } else { 
+                // Find the least recently used page
+                int min = 0;
+                for(cnt2 = 1; cnt2 < q.end; cnt2++) {
+                    if(lastUsed[q.data[min][0] - '0'] > lastUsed[q.data[cnt2][0] - '0']) {
+                        min = cnt2;
+                    }
+                }
+                dequeue(&q, min); 
+                enqueue(&q, string[cnt], min); 
+            } 
+            
+            // Update last used time
+            lastUsed[string[cnt] - '0'] = cnt;
 
-                     } 
+            printf("\t  "); 
+            for(cnt2 = 0; cnt2 < q.end; cnt2++) { 
+                printf("%c   ", q.data[cnt2][0]); 
+            } 
+            printf("\t\tY"); 
+        } else { // No page fault
+            // Update last used time
+            lastUsed[string[cnt] - '0'] = cnt;
 
-              } 
-              if(flag==0) { 
-                     faults++; 
-                     if(q.end<frameSize) {	
-                            enqueue(&q,string[cnt],q.end); 
-                            q.data[q.end][1]=(cnt/2)+1;	
-                            q.end++; 
-                     } 
-                     else { 
+            printf("\t  "); 
+            for(cnt2 = 0; cnt2 < q.end; cnt2++) { 
+                printf("%c   ", q.data[cnt2][0]); 
+            } 
+            printf("\t\tN"); 
+        } 
+    } 
+    printf("\n\n==============================================\n"); 
+    printf("\nTotal no. of Page Faults: %d\n\n", faults); 
+}
 
-                            min=99; 
-                                                               
-                            for(cnt2=0;cnt2<q.end;cnt2++) { 
-                                   if(q.data[cnt2][1]<min) { 
-                                          min=q.data[cnt2][1]; 
-                                          selector=cnt2; 
-                                   } 
-                            } 
-                            dequeue(&q,selector); 
-                            enqueue(&q,string[cnt],selector); 
-                            q.data[selector][1]=(cnt/2)+1;	
-                     } 
-                     printf("\t  "); 
-                     for(cnt2=0;cnt2<q.end;cnt2++) { 
-                            printf("%c   ",q.data[cnt2][0]); 
-                     } 
-                     printf("\t\tY"); 
+Output :-
 
-              } 
+[Saru1594@localhost 6]$ gcc pagereplacement.c 
+[Saru1594@localhost 6]$ ./a.out
+Enter the string: 70120304230321201701
 
-              else {	
-                     printf("\t  "); 
-                     for(cnt2=0;cnt2<q.end;cnt2++) { 
-                            printf("%c   ",q.data[cnt2][0]); 
-                     } 
-                     printf("\t\tN"); 
-              } 
-       } 
-       printf("\n\n==============================================\n"); 
-       printf("\nTotal no. of Page Faults: %d\n\n",faults); 
+Enter the size of the frame: 3
 
-} 
+MENU
+====
+1.FIFO
+2.Least Recently Used (LRU)
+3.Optimal
+4.Exit
+
+Your Choice:1
+
+Data Requested	Frame contents	    Page Fault
+==============================================
+
+	7	  7   		Y
+
+	0	  7   0   		Y
+
+	1	  7   0   1   		Y
+
+	2	  2   0   1   		Y
+
+	0	  2   0   1   		N
+
+	3	  2   3   1   		Y
+
+	0	  2   3   0   		Y
+
+	4	  4   3   0   		Y
+
+	2	  4   2   0   		Y
+
+	3	  4   2   3   		Y
+
+	0	  0   2   3   		Y
+
+	3	  0   2   3   		N
+
+	2	  0   2   3   		N
+
+	1	  0   1   3   		Y
+
+	2	  0   1   2   		Y
+
+	0	  0   1   2   		N
+
+	1	  0   1   2   		N
+
+	7	  7   1   2   		Y
+
+	0	  7   0   2   		Y
+
+	1	  7   0   1   		Y
+
+==============================================
+
+Total no. of Page Faults: 15
+
+
+MENU
+====
+1.FIFO
+2.Least Recently Used (LRU)
+3.Optimal
+4.Exit
+
+Your Choice:2
+
+Data Requested	Frame contents	    Page Fault
+==============================================
+
+	7	  7   		Y
+
+	0	  7   0   		Y
+
+	1	  7   0   1   		Y
+
+	2	  2   0   1   		Y
+
+	0	  2   0   1   		N
+
+	3	  2   0   3   		Y
+
+	0	  2   0   3   		N
+
+	4	  4   0   3   		Y
+
+	2	  4   0   2   		Y
+
+	3	  4   3   2   		Y
+
+	0	  0   3   2   		Y
+
+	3	  0   3   2   		N
+
+	2	  0   3   2   		N
+
+	1	  1   3   2   		Y
+
+	2	  1   3   2   		N
+
+	0	  1   0   2   		Y
+
+	1	  1   0   2   		N
+
+	7	  1   0   7   		Y
+
+	0	  1   0   7   		N
+
+	1	  1   0   7   		N
+
+==============================================
+
+Total no. of Page Faults: 12
+
+
+MENU
+====
+1.FIFO
+2.Least Recently Used (LRU)
+3.Optimal
+4.Exit
+
+Your Choice:3
+
+Data Requested	Frame contents	    Page Fault
+==============================================
+
+	7	  7   		Y
+
+	0	  7   0   		Y
+
+	1	  7   0   1   		Y
+
+	2	  2   0   1   		Y
+
+	0	  2   0   1   		N
+
+	3	  2   0   3   		Y
+
+	0	  2   0   3   		N
+
+	4	  2   4   3   		Y
+
+	2	  2   4   3   		N
+
+	3	  2   4   3   		N
+
+	0	  2   0   3   		Y
+
+	3	  2   0   3   		N
+
+	2	  2   0   3   		N
+
+	1	  2   0   1   		Y
+
+	2	  2   0   1   		N
+
+	0	  2   0   1   		N
+
+	1	  2   0   1   		N
+
+	7	  7   0   1   		Y
+
+	0	  7   0   1   		N
+
+	1	  7   0   1   		N
+
+==============================================
+
+Total no. of Page Faults: 9
+
+
+MENU
+====
+1.FIFO
+2.Least Recently Used (LRU)
+3.Optimal
+4.Exit
+
+Your Choice:4
+ 
